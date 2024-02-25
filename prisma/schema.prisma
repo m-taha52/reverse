@@ -20,3 +20,17 @@ enum Role {
   SUBACCOUNT_USER
   SUBACCOUNT_GUEST
 }
+
+model User {
+  id String @id @default(uuid())
+  name String
+  avatarUrl String @db.Text
+  email String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role Role @default(SUBACCOUNT_USER)
+  agencyId String?
+  Agency Agency @relation(field: [agencyId], references: [id], onDelete: Cascade)
+  @@index([agencyId])
+
+}
