@@ -3,16 +3,14 @@ import { currentUser } from '@clerk/nextjs'
 import { redirect } from "next/navigation"
 import { getAuthUserDetails, verifyAndAcceptInvitation } from '@/lib/queries'
 import { Plan } from '@prisma/client'
+import AgencyDetails from '@/components/forms/agency-details'
 
 const page = async ({searchParams} : {searchParams: {plan: Plan; state: string; code: string} }) => {
 
   const agencyId = await verifyAndAcceptInvitation();
   console.log(agencyId);
-
-  // get users details
-  //their access will determine if they should stay on this page or get redirected to a subaccount
-
   const user = await getAuthUserDetails();
+  //role-based routing
   if (agencyId)
   {
     if(user?.role === "SUBACCOUNT_GUEST" || user?.role === 'SUBACCOUNT_USER')
@@ -43,10 +41,31 @@ const page = async ({searchParams} : {searchParams: {plan: Plan; state: string; 
       return <div> Not Authorized </div>
     }
   }
+
+  const authUser = await currentUser();
+
   return (
-    <div>agency</div>
+    <div className='flex justify-center items-center mt-4'>
+
+      <div className='max-w-[850] border-[1px] p-4 rounded-xl'> 
+        <h1 className='text-4xl'> Create An Agency  </h1>
+        <AgencyDetails 
+        data = {
+          {
+            companyEmail: authUser?.emailAddresses[0].emailAddress
+          }
+        }
+        />
+
+
+      </div>
+
+    
+
+    </div>
   )
 }
+
 
 
 
