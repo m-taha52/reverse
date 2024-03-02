@@ -17,6 +17,7 @@ import { Input } from '../ui/input'
 import { Switch } from '../ui/switch'
 import { Button } from '../ui/button'
 import { saveActivityLogsNotification, updateAgencyDetails } from '@/lib/queries'
+import Loading from '../global/loading'
 
 type Props = {
     data?: Partial<Agency> 
@@ -318,7 +319,7 @@ const AgencyDetails = ({data}: Props) => {
                          type="submit"
                          disabled={isLoading}
                          >
-                             {isLoading ? "Loading... " : 'Save Agency Information'}
+                             {isLoading ? <Loading />: 'Save Agency Information'}
 
                         </Button>
 
