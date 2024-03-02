@@ -26,7 +26,7 @@ import FileUpload from '../global/file-upload'
 import { Input } from '../ui/input'
 import { Switch } from '../ui/switch'
 import { Button } from '../ui/button'
-import { saveActivityLogsNotification, updateAgencyDetails } from '@/lib/queries'
+import { deleteAgency, initUser, saveActivityLogsNotification, updateAgencyDetails } from '@/lib/queries'
 import Loading from '../global/loading'
 
 type Props = {
@@ -49,7 +49,7 @@ const FormSchema = z.object({
 )
 
 const AgencyDetails = ({data}: Props) => {
-    const toast = useToast()
+    const {toast} = useToast()
     const router = useRouter();
     const [deletingAgency, setDeletingAgency] = useState(false)
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -79,15 +79,65 @@ const AgencyDetails = ({data}: Props) => {
         }
     }, [data])
 
-    const handleSubmit = async () => 
+    const handleSubmit = async (values: z.infer<typeof FormSchema>) => 
     {
+        try {
+            let newUserData;
+            let customerId;
+            if( !data?.id)
+            {
+                const bodyData = {
+                    email: values.companyEmail,
+                    name: values.name,
+                    shipping: {
+                        address: {
+                            city: values.city,
+                            country: values.country,
+                            line1: values.address,
+                            postal_code: values.zipCode,
+                            state: values.state,
+                        },
+                        name: values.name,
+                    },
+                    address: {
+                        city: values.city,
+                        country: values.country,
+                        line1: values.address,
+                        postal_code: values.zipCode,
+                        state: values.state,
+                    },
+                }
+            }
+            newUserData = await initUser({ role: "AGENCY_OWNER"})
+        }
+        catch(error)
+        {
 
+        }
     }
 
     const handleDeleteAgency = async () => 
     {
         if(!data?.id) return
         setDeletingAgency(true)
+        try {
+            const response = await deleteAgency(data.id)
+            toast({
+                variant:"destructive",
+                title: "Deleted Agency",
+                description: "Deleted your agency and all subaccounts"
+            })
+            router.refresh()
+        } catch(error)
+        {
+            console.log(error)
+            toast({
+                variant:"destructive",
+                title: "oops",
+                description: "Could not delete your agency"
+            })
+        }
+        setDeletingAgency(false)
     }
 
 
