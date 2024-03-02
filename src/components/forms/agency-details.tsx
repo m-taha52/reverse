@@ -287,7 +287,7 @@ const AgencyDetails = ({data}: Props) => {
 
                             </FormField>
                         {
-                            // data?.id && 
+                            data?.id && 
                             <div className='flex flex-col gap-2'>
                                 <FormLabel> Create A Goal </FormLabel>
                                 <FormDescription>
