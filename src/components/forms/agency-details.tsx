@@ -3,7 +3,17 @@ import { Agency } from '@prisma/client'
 import { NumberInput } from '@tremor/react'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertDialog } from '../ui/alert-dialog'
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+  } from "@/components/ui/alert-dialog"
 import {zodResolver} from "@hookform/resolvers/zod"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { useForm } from 'react-hook-form'
@@ -73,6 +83,13 @@ const AgencyDetails = ({data}: Props) => {
     {
 
     }
+
+    const handleDeleteAgency = async () => 
+    {
+        if(!data?.id) return
+        setDeletingAgency(true)
+    }
+
 
   return (
     <AlertDialog>
@@ -326,6 +343,55 @@ const AgencyDetails = ({data}: Props) => {
                         
                     </form>
                 </Form>
+
+                {
+                    data?.id && 
+                    <div className='flex flex-row items-center justify-between rounded-lg border-destructive gap-4 p-4 mt-4'> 
+                        <div>
+                            <div> Danger Zone </div>
+                        </div>
+
+                        <div className='text-muted-foreground'>
+                            Deleting your agency cannot be undone. This will also delete all your subaccounts and all data related to your subaccounts. Subaccounts will no longer have access to funnels, contacts etc.
+                        </div>
+
+                        <AlertDialogTrigger
+                        disabled={isLoading || deletingAgency}
+                        className='text-red-600 p-2 text-center mt-2 rounded-md hover:bg-red-600 hover:text-white whitespace-nowrap'
+                        >
+                            {
+                                deletingAgency ? "Deleting..." : "Delete Agency"
+                            }
+                        </AlertDialogTrigger>
+                    </div>
+                }
+
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className='text-left'>
+                                Are you absolutely sure?
+                        </AlertDialogTitle>
+                        <AlertDialogDescription
+                        className='text-left'
+                        >
+                        This action cannot be undone, This will permanently the Agency Account and all related sub accounts
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter className='flex items-center'>
+                        <AlertDialogCancel className='mb-2'>
+                            Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                        disabled={deletingAgency}
+                        className='bg-desctructive'
+                        onClick={handleDeleteAgency}
+                        >
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
 
             </CardContent>
         </Card>
