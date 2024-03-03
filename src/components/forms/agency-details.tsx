@@ -18,6 +18,8 @@ import {zodResolver} from "@hookform/resolvers/zod"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { v4 } from  'uuid'
+
 
 
 import { useToast } from '../ui/use-toast'
@@ -26,7 +28,7 @@ import FileUpload from '../global/file-upload'
 import { Input } from '../ui/input'
 import { Switch } from '../ui/switch'
 import { Button } from '../ui/button'
-import { deleteAgency, initUser, saveActivityLogsNotification, updateAgencyDetails } from '@/lib/queries'
+import { deleteAgency, initUser, saveActivityLogsNotification, updateAgencyDetails, upsertAgency } from '@/lib/queries'
 import Loading from '../global/loading'
 
 type Props = {
@@ -109,10 +111,44 @@ const AgencyDetails = ({data}: Props) => {
                 }
             }
             newUserData = await initUser({ role: "AGENCY_OWNER"})
+            if(!data?.customerId)
+            {
+                const response = await upsertAgency({
+                    id: data?.id ? data.id : v4(),
+                    customerId: data?.customerId || '',
+                    address: values.address,
+                    agencyLogo: values.agencyLogo,
+                    city: values.city,
+                    companyPhone: values.companyPhone,
+                    country: values.country,
+                    name: values.name,
+                    state: values.state,
+                    whiteLabel: values.whiteLabel,
+                    zipCode: values.zipCode,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    companyEmail: values.companyEmail,
+                    connectAccountId: '',
+                    goal: 5,
+                })
+                toast({
+                    title: "Created Agency",
+                })
+                if(data?.id) return router.refresh()
+                if(response)
+                {
+                    return router.refresh()
+                }
+            }
         }
         catch(error)
         {
-
+            console.log(error)
+            toast({
+                variant: 'destructive',
+                title: 'Oops!',
+                description: 'could not create your agency',
+            })
         }
     }
 
